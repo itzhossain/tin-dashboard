@@ -28,6 +28,10 @@
 <div id="tin" class="hidden">
     <h1 class="text-2xl mb-4">TIN Make</h1>
 
+    <button onclick="setTIN()" class="bg-green-600 px-3 py-1 mb-3 rounded">
+        🔄 New TIN
+    </button>
+
     <form onsubmit="generateTIN(event)" class="space-y-3">
 
         <input id="tinNumber" class="w-full p-2 text-black" readonly>
@@ -41,6 +45,13 @@
         <button class="bg-blue-600 px-4 py-2 rounded">Submit</button>
 
     </form>
+
+    <!-- History -->
+    <div class="mt-6">
+        <h2 class="text-xl">History</h2>
+        <div id="historyBox"></div>
+    </div>
+
 </div>
 
 </div>
@@ -54,13 +65,35 @@ function showPage(page){
     document.getElementById(page).classList.remove('hidden');
 }
 
-// Auto TIN generate
+// Generate 12 digit TIN
 function newTIN(){
     return Math.floor(100000000000 + Math.random()*900000000000);
 }
 
-// Load TIN on start
-document.getElementById("tinNumber").value = newTIN();
+// Set TIN
+function setTIN(){
+    document.getElementById("tinNumber").value = newTIN();
+}
+
+// Load first TIN
+setTIN();
+
+// Load history
+function loadHistory(){
+    let history = JSON.parse(localStorage.getItem("tin_history")) || [];
+    let box = document.getElementById("historyBox");
+
+    box.innerHTML = "";
+
+    history.slice().reverse().forEach(item => {
+        box.innerHTML += `
+        <div class="bg-gray-800 p-2 mt-2 rounded">
+            ${item.tin} - ${item.name}
+        </div>`;
+    });
+}
+
+loadHistory();
 
 // Submit → Print
 function generateTIN(e){
@@ -71,10 +104,22 @@ function generateTIN(e){
     let father = document.getElementById("father").value;
     let address = document.getElementById("address").value;
 
-    let win = window.open();
+    // Save history
+    let data = { tin, name, father, address };
+    let history = JSON.parse(localStorage.getItem("tin_history")) || [];
+    history.push(data);
+    localStorage.setItem("tin_history", JSON.stringify(history));
+
+    loadHistory();
+
+    // Print window
+    let win = window.open("", "_blank");
     win.document.write(`
         <html>
-        <body>
+        <head>
+        <title>TIN Certificate</title>
+        </head>
+        <body style="font-family:sans-serif;padding:20px">
         <h2>TIN Certificate (Demo)</h2>
         <p><b>TIN:</b> ${tin}</p>
         <p><b>Name:</b> ${name}</p>
@@ -82,25 +127,13 @@ function generateTIN(e){
         <p><b>Address:</b> ${address}</p>
         <button onclick="window.print()">Print</button>
         </body>
-        <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const form = document.querySelector("form");
+        </html>
+    `);
 
-    if (!form) return; // safety check
+    win.document.close();
+}
 
-    form.addEventListener("submit", function(e) {
-        e.preventDefault();
-
-        let tin = "";
-        for (let i = 0; i < 12; i++) {
-            tin += Math.floor(Math.random() * 10);
-        }
-
-        document.getElementById("tin_number").value = tin;
-
-        alert("TIN Generated: " + tin);
-    });
-});
 </script>
+
 </body>
 </html>
