@@ -1,117 +1,103 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
-<title>TIN Admin Panel</title>
+<title>TIN Demo Generator</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
 </head>
 
-<body class="bg-gray-100 flex">
+<body class="bg-gray-900 text-white p-6">
 
-<!-- Sidebar -->
-<div class="w-64 bg-blue-900 text-white h-screen p-4">
-    <h2 class="text-xl font-bold mb-6">NBR Panel</h2>
+<h1 class="text-2xl mb-4">TIN Generator (Demo)</h1>
 
-    <button onclick="showPage('dashboard')" class="block mb-3">📊 Dashboard</button>
-    <button onclick="showPage('create')" class="block mb-3">➕ Create TIN</button>
-    <button onclick="showPage('list')" class="block">📄 All Records</button>
+<form onsubmit="generate(event)" class="space-y-3 max-w-md">
+<input id="name" placeholder="Name" class="w-full p-2 text-black" required>
+<input id="father" placeholder="Father Name" class="w-full p-2 text-black" required>
+<input id="mother" placeholder="Mother Name" class="w-full p-2 text-black">
+<input id="address" placeholder="Address" class="w-full p-2 text-black" required>
+
+<button class="bg-blue-600 px-4 py-2 rounded">Generate</button>
+</form>
+
+<script>
+function newTIN(){
+    return Math.floor(100000000000 + Math.random()*900000000000);
+}
+
+function generate(e){
+    e.preventDefault();
+
+    let tin = newTIN();
+    let name = document.getElementById("name").value;
+    let father = document.getElementById("father").value;
+    let mother = document.getElementById("mother").value;
+    let address = document.getElementById("address").value;
+
+    let win = window.open();
+
+    win.document.write(`
+<html>
+<head>
+<style>
+body{font-family:Arial; padding:30px;}
+.main{border:3px solid black; padding:20px; position:relative;}
+.watermark{
+position:absolute;
+top:40%;
+left:20%;
+font-size:60px;
+color:red;
+opacity:0.15;
+transform:rotate(-30deg);
+}
+.center{text-align:center;}
+</style>
+</head>
+
+<body>
+
+<div class="main">
+
+<div class="watermark">DEMO</div>
+
+<div class="center">
+<h3>Government of Bangladesh</h3>
+<h4>National Board of Revenue</h4>
+<h4>TIN Certificate (Sample)</h4>
 </div>
 
-<!-- Main -->
-<div class="flex-1 p-6">
+<h2 class="center">TIN: ${tin}</h2>
 
-<!-- Dashboard -->
-<div id="dashboard">
-    <h1 class="text-2xl font-bold mb-4">Dashboard</h1>
-    <div class="bg-white p-4 shadow rounded">
-        Total Records: <span id="total"></span>
-    </div>
-</div>
+<p>This is to certify that <b>${name}</b> is a registered taxpayer (Demo System).</p>
 
-<!-- Create -->
-<div id="create" class="hidden">
-    <h1 class="text-2xl mb-4">Create TIN</h1>
+<h3>Taxpayer Details:</h3>
 
-    <form onsubmit="createTIN(event)" class="space-y-3">
-        <input id="name" placeholder="Name" class="w-full p-2 border">
-        <input id="father" placeholder="Father Name" class="w-full p-2 border">
-        <input id="address" placeholder="Address" class="w-full p-2 border">
+<p>1) Name: <b>${name}</b></p>
+<p>2) Father's Name: <b>${father}</b></p>
+<p>3) Mother's Name: <b>${mother}</b></p>
+<p>4) Address: <b>${address}</b></p>
 
-        <button class="bg-blue-600 text-white px-4 py-2">Generate</button>
-    </form>
-</div>
+<br>
 
-<!-- List -->
-<div id="list" class="hidden">
-    <h1 class="text-2xl mb-4">All TIN</h1>
-    <div id="listBox"></div>
-</div>
+<canvas id="qr"></canvas>
+
+<br><br>
+<p>Date: ${new Date().toDateString()}</p>
+
+<br>
+<button onclick="window.print()">Print</button>
 
 </div>
 
 <script>
+QRCode.toCanvas(document.getElementById('qr'), '${tin}');
+</script>
 
-// Page switch
-function showPage(p){
-    ["dashboard","create","list"].forEach(id=>{
-        document.getElementById(id).classList.add("hidden");
-    });
-    document.getElementById(p).classList.remove("hidden");
+</body>
+</html>
+`);
 }
-
-// Generate TIN
-function genTIN(){
-    return Math.floor(100000000000 + Math.random()*900000000000);
-}
-
-// Create
-function createTIN(e){
-    e.preventDefault();
-
-    let data = {
-        tin: genTIN(),
-        name: name.value,
-        father: father.value,
-        address: address.value
-    };
-
-    let db = JSON.parse(localStorage.getItem("db")) || [];
-    db.push(data);
-    localStorage.setItem("db", JSON.stringify(db));
-
-    loadData();
-    alert("TIN Created!");
-}
-
-// Load Data
-function loadData(){
-    let db = JSON.parse(localStorage.getItem("db")) || [];
-    document.getElementById("total").innerText = db.length;
-
-    let box = document.getElementById("listBox");
-    box.innerHTML = "";
-
-    db.reverse().forEach(item=>{
-        let id = "qr"+item.tin;
-
-        box.innerHTML += `
-        <div class="bg-white p-4 mb-3 shadow rounded flex justify-between">
-            <div>
-                <b>${item.tin}</b><br>
-                ${item.name}<br>
-                ${item.address}
-            </div>
-            <div id="${id}"></div>
-        </div>
-        `;
-
-        QRCode.toCanvas(document.getElementById(id), item.tin);
-    });
-}
-
-loadData();
-
 </script>
 
 </body>
