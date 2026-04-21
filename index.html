@@ -87,6 +87,20 @@ function generateTIN(e){
 }
 
 </script>
+<script>
+document.querySelector("form").addEventListener("submit", function(e) {
+    e.preventDefault();
 
+    // Random 12 digit TIN generate
+    let tin = "";
+    for (let i = 0; i < 12; i++) {
+        tin += Math.floor(Math.random() * 10);
+    }
+
+    document.getElementById("tin_number").value = tin;
+
+    alert("TIN Generated: " + tin);
+});
+</script>
 </body>
 </html>
