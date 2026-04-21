@@ -11,130 +11,47 @@
 
 <h2 class="text-2xl mb-4">Manual TIN Form</h2>
 
-<form onsubmit="generateTIN(event)" class="space-y-3 max-w-xl">
+<form id="form" class="space-y-3 max-w-xl">
 
-<input id="tin" class="w-full p-2 text-black" placeholder="TIN Number (12 digit)" required>
+<input id="name" placeholder="Name" class="w-full p-2 text-black" required>
+<input id="father" placeholder="Father Name" class="w-full p-2 text-black">
+<input id="address" placeholder="Address" class="w-full p-2 text-black">
 
-<input id="circle" class="w-full p-2 text-black" placeholder="Taxes Circle">
-
-<input id="zone" class="w-full p-2 text-black" placeholder="Taxes Zone">
-
-<input id="name" class="w-full p-2 text-black" placeholder="Name" required>
-
-<input id="dob" class="w-full p-2 text-black" placeholder="Date of Birth">
-
-<input id="father" class="w-full p-2 text-black" placeholder="Father Name">
-
-<input id="mother" class="w-full p-2 text-black" placeholder="Mother Name">
-
-<input id="current" class="w-full p-2 text-black" placeholder="Current Address">
-
-<input id="permanent" class="w-full p-2 text-black" placeholder="Permanent Address">
-
-<input id="date" class="w-full p-2 text-black" placeholder="Date">
-
-<input id="office" class="w-full p-2 text-black" placeholder="Office Address">
-
-<button class="bg-blue-600 px-4 py-2 rounded">Submit</button>
+<button class="bg-blue-600 px-4 py-2">Submit</button>
 
 </form>
 
+<!-- RESULT -->
+<div id="result" class="hidden bg-white text-black mt-6 p-6"></div>
+
 <script>
 
-// auto TIN fallback
 function newTIN(){
  return Math.floor(100000000000 + Math.random()*900000000000);
 }
 
-function generateTIN(e){
+document.getElementById("form").addEventListener("submit", function(e){
  e.preventDefault();
 
- let tin = document.getElementById("tin").value || newTIN();
+ let tin = newTIN();
+ let name = document.getElementById("name").value;
+ let father = document.getElementById("father").value;
+ let address = document.getElementById("address").value;
 
- let data = {
-  circle: document.getElementById("circle").value,
-  zone: document.getElementById("zone").value,
-  name: document.getElementById("name").value,
-  dob: document.getElementById("dob").value,
-  father: document.getElementById("father").value,
-  mother: document.getElementById("mother").value,
-  current: document.getElementById("current").value,
-  permanent: document.getElementById("permanent").value,
-  date: document.getElementById("date").value,
-  office: document.getElementById("office").value
- };
-
- let win = window.open();
-
- win.document.write(`
- <html>
- <head>
- <style>
- body{font-family:Arial;padding:30px;}
- .main{border:2px solid black;padding:20px;}
- .center{text-align:center;}
- .watermark{
-  position:fixed;
-  top:40%;
-  left:20%;
-  font-size:60px;
-  color:red;
-  opacity:0.08;
-  transform:rotate(-30deg);
- }
- table{width:100%;font-size:14px;border-collapse:collapse;}
- td{border:1px solid black;padding:6px;}
- </style>
- </head>
-
- <body>
-
- <div class="watermark">DEMO</div>
-
- <div class="main">
-
- <div class="center">
-  <h3>Government of Bangladesh</h3>
-  <h4>National Board of Revenue</h4>
-  <h4>TIN Certificate (Sample)</h4>
- </div>
-
- <h2 class="center">TIN: ${tin}</h2>
-
- <p>This is to certify that <b>${data.name}</b> is registered in this demo system under 
- <b>${data.circle}</b>, Zone <b>${data.zone}</b>.</p>
-
- <table>
- <tr><td>Name</td><td>${data.name}</td></tr>
- <tr><td>Father</td><td>${data.father}</td></tr>
- <tr><td>Mother</td><td>${data.mother}</td></tr>
- <tr><td>DOB</td><td>${data.dob}</td></tr>
- <tr><td>Current Address</td><td>${data.current}</td></tr>
- <tr><td>Permanent Address</td><td>${data.permanent}</td></tr>
- </table>
-
- <br>
-
+ let html = `
+ <h2 style="text-align:center">TIN: ${tin}</h2>
+ <p>Name: <b>${name}</b></p>
+ <p>Father: <b>${father}</b></p>
+ <p>Address: <b>${address}</b></p>
  <canvas id="qr"></canvas>
+ `;
 
- <br><br>
+ let result = document.getElementById("result");
+ result.innerHTML = html;
+ result.classList.remove("hidden");
 
- <p>Date: ${data.date}</p>
- <p>Office: ${data.office}</p>
-
- <br>
- <button onclick="window.print()">Print</button>
-
- </div>
-
- <script>
- QRCode.toCanvas(document.getElementById('qr'), '${tin}');
- </script>
-
- </body>
- </html>
- `);
-}
+ QRCode.toCanvas(document.getElementById('qr'), tin);
+});
 
 </script>
 
