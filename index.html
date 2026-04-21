@@ -2,15 +2,16 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>TIN Dashboard</title>
+<title>TIN Dashboard Pro</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body class="bg-gray-900 text-white flex">
 
 <!-- Sidebar -->
 <div class="w-64 bg-black h-screen p-4">
-    <h2 class="text-xl font-bold mb-6">Dashboard</h2>
+    <h2 class="text-xl font-bold mb-6">TIN Dashboard</h2>
 
     <button onclick="showPage('home')" class="block mb-3">🏠 Home</button>
     <button onclick="showPage('tin')" class="block">📄 TIN Make</button>
@@ -22,6 +23,7 @@
 <!-- Home -->
 <div id="home">
     <h1 class="text-2xl font-bold">Welcome</h1>
+    <p class="mt-2 text-gray-400">TIN Generator Dashboard</p>
 </div>
 
 <!-- TIN Page -->
@@ -65,7 +67,7 @@ function showPage(page){
     document.getElementById(page).classList.remove('hidden');
 }
 
-// Generate 12 digit TIN
+// Generate TIN
 function newTIN(){
     return Math.floor(100000000000 + Math.random()*900000000000);
 }
@@ -87,15 +89,15 @@ function loadHistory(){
 
     history.slice().reverse().forEach(item => {
         box.innerHTML += `
-        <div class="bg-gray-800 p-2 mt-2 rounded">
-            ${item.tin} - ${item.name}
+        <div class="bg-gray-800 p-2 mt-2 rounded flex justify-between">
+            <span>${item.tin} - ${item.name}</span>
         </div>`;
     });
 }
 
 loadHistory();
 
-// Submit → Print
+// Generate + Print + Save + PDF
 function generateTIN(e){
     e.preventDefault();
 
@@ -104,28 +106,45 @@ function generateTIN(e){
     let father = document.getElementById("father").value;
     let address = document.getElementById("address").value;
 
-    // Save history
     let data = { tin, name, father, address };
+
     let history = JSON.parse(localStorage.getItem("tin_history")) || [];
     history.push(data);
     localStorage.setItem("tin_history", JSON.stringify(history));
 
     loadHistory();
 
-    // Print window
+    let content = `
+    <div id="pdfContent" style="font-family:sans-serif;padding:20px">
+        <h2>TIN Certificate</h2>
+        <hr>
+        <p><b>TIN:</b> ${tin}</p>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Father:</b> ${father}</p>
+        <p><b>Address:</b> ${address}</p>
+    </div>
+    `;
+
     let win = window.open("", "_blank");
     win.document.write(`
         <html>
         <head>
         <title>TIN Certificate</title>
         </head>
-        <body style="font-family:sans-serif;padding:20px">
-        <h2>TIN Certificate (Demo)</h2>
-        <p><b>TIN:</b> ${tin}</p>
-        <p><b>Name:</b> ${name}</p>
-        <p><b>Father:</b> ${father}</p>
-        <p><b>Address:</b> ${address}</p>
-        <button onclick="window.print()">Print</button>
+        <body>
+        ${content}
+        <button onclick="window.print()">🖨 Print</button>
+        <button onclick="downloadPDF()">📥 Download PDF</button>
+
+        <script>
+        function downloadPDF(){
+            let element = document.getElementById('pdfContent');
+            html2pdf().from(element).save('TIN_Certificate.pdf');
+        }
+        </script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>
+
         </body>
         </html>
     `);
