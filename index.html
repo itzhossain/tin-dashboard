@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TIN Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-900 text-white flex">
+
+<!-- Sidebar -->
+<div class="w-64 bg-black h-screen p-4">
+    <h2 class="text-xl font-bold mb-6">Dashboard</h2>
+
+    <button onclick="showPage('home')" class="block mb-3">🏠 Home</button>
+    <button onclick="showPage('tin')" class="block">📄 TIN Make</button>
+</div>
+
+<!-- Main -->
+<div class="flex-1 p-6">
+
+<!-- Home -->
+<div id="home">
+    <h1 class="text-2xl font-bold">Welcome</h1>
+</div>
+
+<!-- TIN Page -->
+<div id="tin" class="hidden">
+    <h1 class="text-2xl mb-4">TIN Make</h1>
+
+    <form onsubmit="generateTIN(event)" class="space-y-3">
+
+        <input id="tinNumber" class="w-full p-2 text-black" readonly>
+
+        <input id="name" placeholder="Name" class="w-full p-2 text-black">
+
+        <input id="father" placeholder="Father Name" class="w-full p-2 text-black">
+
+        <input id="address" placeholder="Address" class="w-full p-2 text-black">
+
+        <button class="bg-blue-600 px-4 py-2 rounded">Submit</button>
+
+    </form>
+</div>
+
+</div>
+
+<script>
+
+// Page switch
+function showPage(page){
+    document.getElementById('home').classList.add('hidden');
+    document.getElementById('tin').classList.add('hidden');
+    document.getElementById(page).classList.remove('hidden');
+}
+
+// Auto TIN generate
+function newTIN(){
+    return Math.floor(100000000000 + Math.random()*900000000000);
+}
+
+// Load TIN on start
+document.getElementById("tinNumber").value = newTIN();
+
+// Submit → Print
+function generateTIN(e){
+    e.preventDefault();
+
+    let tin = document.getElementById("tinNumber").value;
+    let name = document.getElementById("name").value;
+    let father = document.getElementById("father").value;
+    let address = document.getElementById("address").value;
+
+    let win = window.open();
+    win.document.write(`
+        <html>
+        <body>
+        <h2>TIN Certificate (Demo)</h2>
+        <p><b>TIN:</b> ${tin}</p>
+        <p><b>Name:</b> ${name}</p>
+        <p><b>Father:</b> ${father}</p>
+        <p><b>Address:</b> ${address}</p>
+        <button onclick="window.print()">Print</button>
+        </body>
+        </html>
+    `);
+}
+
+</script>
+
+</body>
+</html>
