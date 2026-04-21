@@ -82,24 +82,24 @@ function generateTIN(e){
         <p><b>Address:</b> ${address}</p>
         <button onclick="window.print()">Print</button>
         </body>
-        </html>
-    `);
-}
+        <script>
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.querySelector("form");
 
-</script>
-<script>
-document.querySelector("form").addEventListener("submit", function(e) {
-    e.preventDefault();
+    if (!form) return; // safety check
 
-    // Random 12 digit TIN generate
-    let tin = "";
-    for (let i = 0; i < 12; i++) {
-        tin += Math.floor(Math.random() * 10);
-    }
+    form.addEventListener("submit", function(e) {
+        e.preventDefault();
 
-    document.getElementById("tin_number").value = tin;
+        let tin = "";
+        for (let i = 0; i < 12; i++) {
+            tin += Math.floor(Math.random() * 10);
+        }
 
-    alert("TIN Generated: " + tin);
+        document.getElementById("tin_number").value = tin;
+
+        alert("TIN Generated: " + tin);
+    });
 });
 </script>
 </body>
